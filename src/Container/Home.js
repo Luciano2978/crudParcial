@@ -8,13 +8,41 @@ import Contexto from "../Context/Contexto";
 export default function Home(){
 
 
-    const [ nombre, setNombre] = useState("");
-    const [ autor, setAutor] = useState("");
-    const [ edicion, setEdicion] = useState("");
+    const [ codigo, setCodigo] = useState("");
+    const [ descripcion,setDescripcion] = useState("");
+    const [ exisInicial, setExisInicial] = useState("");
+    const [ identificador, setIdentificador ] = useState("");
+    const { registrarProducto,inventario,modoficarProducto,eliminarProducto,entradas} = useContext(Contexto);
 
+    function iden(id){
+        const ide = id;
+        setIdentificador(ide)
+    }
 
+    const registroProd = async (e) => {
+        e.preventDefault();
+        await registrarProducto(codigo,descripcion,exisInicial)
+    }
 
+    const modProducto = async (e) => {
+        e.preventDefault();
+        await modoficarProducto(identificador,codigo,descripcion,exisInicial)
+    }
 
+    const eleminiarProd = async (e) => {
+        e.preventDefault();
+        await eliminarProducto(identificador);
+    }
+
+    inventario.forEach(element => {
+        const existInicial = parseInt(element.ExistenciaInicial);
+        var totalStock = exisInicial + element.Entradas;
+
+        console.log(totalStock)
+    });
+    
+    
+    
 
 
     return(
@@ -25,10 +53,12 @@ export default function Home(){
                         <div className="table-title">
                             <div className="row">
                                 <div className="col-sm-6">
-                                    <h2>Biblioteca</h2>
+                                    <h2>Productos Inventarios</h2>
                                 </div>
-                                <div className="col-sm-6">
-                                    <a href="#addEmployeeModal" className="btn btn-success" data-toggle="modal"><i className="material-icons">&#xE147;</i> <span>Añadir Nuevo Libro</span></a>						
+                                <div className="col-xs-6">
+                                    <a href="#addEmployeeModal" className="btn btn-sm btn-info" data-toggle="modal"><i className="material-icons">&#xE147;</i> <span>Añadir Nuevo Producto</span></a>						
+                                    <a href="/Entradas" className="btn btn-sm btn-success" ><i className="material-icons">&#xE147;</i> <span>Registrar Entrada de Producto</span></a>
+                                    <a href="/Salidas" className="btn btn-sm btn-danger" ><i className="material-icons">&#xE147;</i> <span>Registrar Salida de Producto</span></a>
                                 </div>
                             </div>
                         </div>
@@ -41,89 +71,99 @@ export default function Home(){
                                             <label htmlFor="selectAll"></label>
                                         </span>
                                     </th>
-                                    <th>Nombre</th>
-                                    <th>Autor</th>
-                                    <th>Edicion</th>
+                                    <th>Codigo Producto</th>
+                                    <th>Descripcion</th>
+                                    <th>Existencias Iniciales</th>
+                                    <th>Entradas</th>
+                                    <th>Salidas</th>
+                                    <th>Stock</th>
+                                    <th>Acciones</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
+                                {inventario.map((invProducto) => (
+                                <tr key={invProducto.id}>
                                     <td>
                                         <span className="custom-checkbox">
                                             <input type="checkbox" id="checkbox1" name="options[]" value="1"/>
                                             <label htmlFor="checkbox1"></label>
                                         </span>
                                     </td>
-                                    <td>Nombre</td>
-                                    <td>Autor</td>
-                                    <td>Edicion</td>
+                                    <td>{invProducto.Codigo}</td>
+                                    <td>{invProducto.Descripcion}</td>
+                                    <td>{invProducto.ExistenciaInicial}</td>
+                                    <td>{invProducto.Entradas}</td>
+                                    <td>{invProducto.Salidas}</td>
+                                    <td>{invProducto.Stock}</td>
                                     <td>
-                                        <a href="#editEmployeeModal" className="edit" data-toggle="modal"><i className="material-icons" data-toggle="tooltip" title="Edit">&#xE254;</i></a>
-                                        <a href="#deleteEmployeeModal" className="delete"  data-toggle="modal"><i className="material-icons" data-toggle="tooltip" title="Delete">&#xE872;</i></a>
+                                        <a href="#editEmployeeModal" className="edit" onClick={() => iden(invProducto.id)} data-toggle="modal"><i className="material-icons" data-toggle="tooltip" title="Edit">&#xE254;</i></a>
+                                        <a href="#deleteEmployeeModal" className="delete" onClick={() => iden(invProducto.id)} data-toggle="modal"><i className="material-icons" data-toggle="tooltip" title="Delete">&#xE872;</i></a>
                                     </td>
-                                </tr>    
+                                </tr> 
+                                ))}    
                             </tbody>
                         </table>
                     </div>
                 </div>        
             </div>
-            {/* <!-- Añadir nuevo Libro --> */}
+            {/* <!-- Añadir nuevo Producto --> */}
             <div id="addEmployeeModal" className="modal fade">
                 <div className="modal-dialog">
                     <div className="modal-content">
                         <div>
                             <div className="modal-header">						
-                                <h4 className="modal-title">Añadir Libro</h4>
+                                <h4 className="modal-title">Añadir Producto</h4>
                                 <button type="button" className="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                             </div>
                             <div className="modal-body">					
                                 <div className="form-group">
-                                    <label>Nombre</label>
-                                    <input type="text" className="form-control" required onChange={(e) => setNombre(e.target.value) } />
+                                    <label>Codigo</label>
+                                    <input type="text" className="form-control" required onChange={(e) => setCodigo(e.target.value) } />
                                 </div>
                                 <div className="form-group">
-                                    <label>Autor</label>
-                                    <input type="email" className="form-control" required onChange={(e) => setAutor(e.target.value)}/>
+                                    <label>Descripcion</label>
+                                    <textarea type="text" className="form-control" required onChange={(e) => setDescripcion(e.target.value)}></textarea>
                                 </div>
                                 <div className="form-group">
-                                    <label>Edicion</label>
-                                    <textarea className="form-control" required onChange={(e) => setEdicion(e.target.value)}></textarea>
-                                </div>			
+                                    <label>Existencia Inicial</label>
+                                    <input className="form-control" required onChange={(e) => setExisInicial(e.target.value)}/>
+                                </div>
+                                
                             </div>
                             <div className="modal-footer">
                                 <input type="button" className="btn btn-default" data-dismiss="modal" value="Cancel"/>
-                                <input type="submit" className="btn btn-success" value="Añadir"/>
+                                <input type="submit" className="btn btn-success" data-dismiss="modal" value="Añadir" onClick={registroProd}/>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            {/* Editar Libro */}
+            {/* Editar Producto */}
             <div id="editEmployeeModal" className="modal fade">
                 <div className="modal-dialog">
                     <div className="modal-content">
                         <div>
                             <div className="modal-header">						
-                                <h4 className="modal-title">Editar Libro</h4>
+                                <h4 className="modal-title">Editar Producto</h4>
                                 <button type="button" className="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                             </div>
                             <div className="modal-body">					
                                 <div className="form-group">
-                                    <label>Nombre</label>
-                                    <input type="text" className="form-control" required onChange={(e) => setNombre(e.target.value)}/>
+                                    <label>Codigo Producto</label>
+                                    <input type="text" className="form-control" required onChange={(e) => setCodigo(e.target.value)}/>
                                 </div>
                                 <div className="form-group">
-                                    <label>Autor</label>
-                                    <input type="email" className="form-control" required onChange={(e) => setAutor(e.target.value)}/>
+                                    <label>Descripcion</label>
+                                    <textarea type="text" className="form-control" required onChange={(e) => setDescripcion(e.target.value)}></textarea>
                                 </div>
                                 <div className="form-group">
-                                    <label>Edicion</label>
-                                    <textarea className="form-control" required onChange={(e) => setEdicion(e.target.value)}></textarea>
-                                </div>				
+                                    <label>Existencia Inicial</label>
+                                    <input className="form-control" required onChange={(e) => setExisInicial(e.target.value)}/>
+                                </div>		
                             </div>
                             <div className="modal-footer">
                                 <input type="button" className="btn btn-default" data-dismiss="modal" value="Cancel"/>
-                                <input type="submit" className="btn btn-info" value="Guardar"/>
+                                <input type="submit" className="btn btn-info" data-dismiss="modal" value="Guardar" onClick={modProducto}/>
                             </div>
                         </div>
                     </div>
@@ -144,7 +184,7 @@ export default function Home(){
                             </div>
                             <div className="modal-footer">
                                 <input type="button" className="btn btn-default" data-dismiss="modal" value="Cancel"/>
-                                <input type="submit" className="btn btn-danger" value="Eliminar"/>
+                                <input type="submit" className="btn btn-danger" data-dismiss="modal" value="Eliminar" onClick={eleminiarProd}/>
                             </div>
                         </div>
                     </div>
